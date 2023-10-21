@@ -25,18 +25,11 @@ public class ClientService {
     static DataOutputStream out;
     static DataInputStream in;
 
-    public ClientService() {
-        try {
-            socket = new Socket(SERVER_ADDRESS, SERVER_PORT);
-            out = new DataOutputStream(socket.getOutputStream());
-            in = new DataInputStream(socket.getInputStream());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     public void uploadFile(String fileName) {
-        try {
+        try (Socket socket = new Socket(SERVER_ADDRESS, SERVER_PORT);
+             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+             DataInputStream in = new DataInputStream(socket.getInputStream())) {
             // Adicione a lógica para enviar arquivos ao servidor aqui
             out.writeUTF("UPLOAD");// comando para o servidor executar o upload.
 
@@ -58,7 +51,9 @@ public class ClientService {
     }
 
     public void downloadFile(String fileName) {
-        try {
+        try (Socket socket = new Socket(SERVER_ADDRESS, SERVER_PORT);
+             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+             DataInputStream in = new DataInputStream(socket.getInputStream())) {
 
             out.writeUTF("DOWNLOAD"); // comando para o servidor executar o download.
             // passa apenas o nome dos arquivos.
@@ -86,7 +81,9 @@ public class ClientService {
     }
 
     public void listarArquivos() {
-        try {
+        try (Socket socket = new Socket(SERVER_ADDRESS, SERVER_PORT);
+             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+             DataInputStream in = new DataInputStream(socket.getInputStream())) {
             out.writeUTF("LISTAR"); //Envia comando para o servidor listar os itens na pasta.
             String response = in.readUTF();
             System.out.println(response); // Exibir a lista de arquivos no console
