@@ -1,25 +1,27 @@
 package com.sistema.distribuido.service;
+import com.sistema.distribuido.controller.Arquivo;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
 import org.springframework.stereotype.Service;
 
 
-import java.io.IOException;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.*;
 
 import java.net.Socket;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class ClientService {
 
-    private static final String FileCpath = "C:\\test\\"; // substitua pelo caminho dos arquivos a serem enviados/salvos.
+    private static final String FileCpath = "C:\\client\\"; // substitua pelo caminho dos arquivos a serem enviados/salvos.
     private static final String SERVER_ADDRESS = "localhost";
     private static final int SERVER_PORT = 12345;
+
+    private static final int clientPort = 22345;
 
     private Socket socket;
     static DataOutputStream out;
@@ -50,8 +52,24 @@ public class ClientService {
         }
     }
 
-    public void downloadFile(String fileName) {
+
+    public void uploadFileName(String fileName) {
         try (Socket socket = new Socket(SERVER_ADDRESS, SERVER_PORT);
+             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+             ) {
+            // Adicione a lógica para enviar arquivos ao servidor aqui
+            out.writeUTF("STORE_FILE_INFO");// comando para o servidor executar o upload.
+
+            // passando apenas o nome do arquivo para o servidor.
+            out.writeUTF(fileName);
+            out.writeShort(clientPort);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void downloadFile(String fileName,String ipAddress, int port) {
+        try (Socket socket = new Socket(ipAddress, port);
              DataOutputStream out = new DataOutputStream(socket.getOutputStream());
              DataInputStream in = new DataInputStream(socket.getInputStream())) {
 
@@ -80,15 +98,43 @@ public class ClientService {
         }
     }
 
-    public void listarArquivos() {
+    public List<Arquivo> listarArquivos() {
+        List<Arquivo> arquivos = new ArrayList<>();
         try (Socket socket = new Socket(SERVER_ADDRESS, SERVER_PORT);
              DataOutputStream out = new DataOutputStream(socket.getOutputStream());
              DataInputStream in = new DataInputStream(socket.getInputStream())) {
-            out.writeUTF("LISTAR"); //Envia comando para o servidor listar os itens na pasta.
-            String response = in.readUTF();
-            System.out.println(response); // Exibir a lista de arquivos no console
-        } catch (IOException e) {
+            out.writeUTF("REQUEST_FILE_INFO"); //Envia comando para o servidor listar os itens na pasta.
+            boolean fileExists = in.readBoolean();
+            if (fileExists) {
+                int fileSize = in.readInt();
+                byte[] fileData = new byte[fileSize];
+                in.readFully(fileData);
+                String xmlContent = new String(fileData);
+
+                // Ler o conteúdo XML
+                SAXBuilder saxBuilder = new SAXBuilder();
+                Document document = saxBuilder.build(new StringReader(xmlContent));
+                Element root = document.getRootElement();
+
+                List<Element> fileList = root.getChildren("file");
+                for (Element fileElement : fileList) {
+                    String fileName = fileElement.getChildText("fileName");
+                    String ipAddress = fileElement.getChildText("ipAddress");
+                    String port = fileElement.getChildText("port");
+                    Arquivo arquivo = new Arquivo(fileName, ipAddress, Integer.parseInt(port));
+                    arquivos.add(arquivo);
+                }
+            } else {
+                System.out.println("Arquivo não encontrado no servidor.");
+            }
+        } catch (IOException | JDOMException e) {
             e.printStackTrace();
         }
+        return arquivos;
     }
+
+
+
+
+
 }

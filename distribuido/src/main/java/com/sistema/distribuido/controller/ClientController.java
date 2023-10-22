@@ -2,8 +2,12 @@ package com.sistema.distribuido.controller;
 
 import com.sistema.distribuido.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/client")
@@ -21,15 +25,21 @@ public class ClientController {
         return "Arquivo " + fileName + " foi enviado com sucesso.";
     }
 
+    @PostMapping("/uploadFileName")
+    public String uploadFileName(@RequestParam String fileName) {
+        clientService.uploadFileName(fileName);
+        return "Arquivo " + fileName + " foi enviado com sucesso.";
+    }
+
     @GetMapping("/download")
-    public String downloadFile(@RequestParam String fileName) {
-        clientService.downloadFile(fileName);
+    public String downloadFile(@RequestParam String fileName,@RequestParam String ipAddress,@RequestParam int port) {
+        clientService.downloadFile(fileName,ipAddress,port);
         return "Arquivo " + fileName + " foi baixado com sucesso.";
     }
 
     @GetMapping("/list")
-    public String listFiles() {
-        clientService.listarArquivos();
-        return "Listando arquivos disponíveis no servidor.";
+    public ResponseEntity<List<Arquivo>> listFiles() {
+        List<Arquivo> arquivos = clientService.listarArquivos();
+        return new ResponseEntity<>(arquivos, HttpStatus.OK);
     }
 }
