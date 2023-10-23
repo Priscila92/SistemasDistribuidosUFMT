@@ -8,10 +8,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Files;
@@ -27,7 +24,9 @@ public class DistribuidoApplication {
 	private static final int PORT = 22345; // escolha a porta de operação/escuta do servidor.
 	// Local da pasta onde o servidor salvará os arquivos.
 
-	private static final String FILE_STORAGE_PATH = "C:\\test/"; //subistitua o local para o servidor salvar os arquivos.
+	private static final int CHUNK_SIZE = 10;
+
+	private static final String FILE_STORAGE_PATH = "C:\\client-2/"; //subistitua o local para o servidor salvar os arquivos.
 
 	public static void main(String[] args) {
 		SpringApplication.run(DistribuidoApplication.class, args);
@@ -68,7 +67,9 @@ public class DistribuidoApplication {
 			 if (request.equals("DOWNLOAD")) {
 					// Cliente está solicitando um arquivo
 					String fileName = in.readUTF();
-					sendFile(fileName, out);
+				    long startPosition = in.readLong();
+					int chunkSize = in.readInt();
+					sendFile(fileName, out, startPosition,chunkSize);
 				}
 
 			} catch (IOException e) {
@@ -77,13 +78,34 @@ public class DistribuidoApplication {
 		}
 	}
 
-	private static void sendFile(String fileName, DataOutputStream out) throws IOException {
+/*	private static void sendFile(String fileName, DataOutputStream out) throws IOException {
 		Path filePath = Path.of(FILE_STORAGE_PATH + fileName);
 		if (Files.exists(filePath)) {
 			out.writeBoolean(true); // Indica que o arquivo existe
 			byte[] fileData = Files.readAllBytes(filePath);
 			out.writeInt(fileData.length); // Tamanho do arquivo
 			out.write(fileData);
+			System.out.println("Enviado arquivo " + fileName + " para o cliente.");
+		} else {
+			out.writeBoolean(false); // Indica que o arquivo não existe
+		}
+	}*/
+
+
+	private static void sendFile(String fileName, DataOutputStream out, long startPosition, int chunkSize) throws IOException {
+		Path filePath = Path.of(FILE_STORAGE_PATH + fileName);
+		if (Files.exists(filePath)) {
+			out.writeBoolean(true); // Indica que o arquivo existe
+			File file = filePath.toFile();
+			out.writeLong(file.length());
+			try (RandomAccessFile raf = new RandomAccessFile(filePath.toFile(), "r")) {
+				raf.seek(startPosition); // Define a posição inicial no arquivo
+				byte[] buffer = new byte[chunkSize];
+				int bytesRead;
+				while ((bytesRead = raf.read(buffer)) != -1) {
+					out.write(buffer, 0, bytesRead);
+				}
+			}
 			System.out.println("Enviado arquivo " + fileName + " para o cliente.");
 		} else {
 			out.writeBoolean(false); // Indica que o arquivo não existe

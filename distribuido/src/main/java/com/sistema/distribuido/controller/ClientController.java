@@ -32,8 +32,9 @@ public class ClientController {
     }
 
     @GetMapping("/download")
-    public String downloadFile(@RequestParam String fileName,@RequestParam String ipAddress,@RequestParam int port) {
-        clientService.downloadFile(fileName,ipAddress,port);
+    public String downloadFile(@RequestParam String fileName,@RequestParam String ipAddress,@RequestParam int port,
+                               @RequestParam long startByte,@RequestParam int chunkSize) {
+        clientService.downloadFile(fileName,ipAddress,port,startByte,chunkSize);
         return "Arquivo " + fileName + " foi baixado com sucesso.";
     }
 

@@ -17,11 +17,14 @@ import java.util.List;
 @Service
 public class ClientService {
 
-    private static final String FileCpath = "C:\\client\\"; // substitua pelo caminho dos arquivos a serem enviados/salvos.
+    private static final String FileCpath = "C:\\client-1\\"; // substitua pelo caminho dos arquivos a serem enviados/salvos.
     private static final String SERVER_ADDRESS = "localhost";
     private static final int SERVER_PORT = 12345;
 
     private static final int clientPort = 22345;
+
+
+    private static final int CHUNK_SIZE = 10;
 
     private Socket socket;
     static DataOutputStream out;
@@ -68,7 +71,7 @@ public class ClientService {
         }
     }
 
-    public void downloadFile(String fileName,String ipAddress, int port) {
+/*    public void downloadFile(String fileName,String ipAddress, int port) {
         try (Socket socket = new Socket(ipAddress, port);
              DataOutputStream out = new DataOutputStream(socket.getOutputStream());
              DataInputStream in = new DataInputStream(socket.getInputStream())) {
@@ -89,6 +92,41 @@ public class ClientService {
 
         } catch (IOException ex) {
            ex.printStackTrace();
+        }
+    }*/
+
+    public void downloadFile(String fileName, String ipAddress, int port, long startByte, int chunkSize) {
+        try (Socket socket = new Socket(ipAddress, port);
+             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+             DataInputStream in = new DataInputStream(socket.getInputStream())) {
+
+            out.writeUTF("DOWNLOAD");
+            out.writeUTF(fileName);
+            out.writeLong(startByte);
+            out.writeInt(chunkSize);
+            boolean fileExists = in.readBoolean();
+            long fileSize = in.readLong();
+            if (fileExists) {
+                try (RandomAccessFile file = new RandomAccessFile(FileCpath + fileName, "rw")) {
+                    long remainingBytes = fileSize - startByte;
+
+                    while (remainingBytes > 0) {
+                        long bytesToRead = Math.min(chunkSize, remainingBytes); // Certifique-se de que não leia mais do que o necessário
+                        byte[] buffer = new byte[(int) bytesToRead];
+                        int bytesRead = in.read(buffer);
+                        if (bytesRead == -1) {
+                            break;
+                        }
+                        file.seek(startByte); // Define a posição de gravação no arquivo
+                        file.write(buffer, 0, bytesRead);
+                        remainingBytes = 0;
+                    }
+                }
+            } else {
+                System.out.println("Arquivo não encontrado no servidor.");
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
     }
 
