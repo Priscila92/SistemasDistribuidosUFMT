@@ -56,15 +56,18 @@ public class ClientService {
     }
 
 
-    public void uploadFileName(String fileName) {
+    public void uploadFileName(List<String> fileNames) {
         try (Socket socket = new Socket(SERVER_ADDRESS, SERVER_PORT);
-             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-             ) {
-            // Adicione a lógica para enviar arquivos ao servidor aqui
-            out.writeUTF("STORE_FILE_INFO");// comando para o servidor executar o upload.
+             DataOutputStream out = new DataOutputStream(socket.getOutputStream())) {
 
-            // passando apenas o nome do arquivo para o servidor.
-            out.writeUTF(fileName);
+            out.writeUTF("STORE_FILE_INFO"); // Comando para o servidor executar o upload.
+
+            out.writeInt(fileNames.size()); // Envia o tamanho da lista de nomes de arquivos primeiro.
+
+            for (String fileName : fileNames) {
+                out.writeUTF(fileName); // Envia cada nome de arquivo para o servidor.
+            }
+
             out.writeShort(clientPort);
         } catch (IOException ex) {
             ex.printStackTrace();

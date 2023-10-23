@@ -18,7 +18,7 @@ import java.nio.file.Path;
 
 @SpringBootApplication
 @ComponentScan(basePackageClasses = {ClientController.class, ClientService.class,Config.class})
-public class DistribuidoApplication {
+public class ClientApplication {
 
 	private static final int PORT = 22345; // escolha a porta de operação/escuta do servidor.
 	// Local da pasta onde o servidor salvará os arquivos.
@@ -28,7 +28,7 @@ public class DistribuidoApplication {
 	private static final String FILE_STORAGE_PATH = "C:\\client-2/"; //subistitua o local para o servidor salvar os arquivos.
 
 	public static void main(String[] args) {
-		SpringApplication.run(DistribuidoApplication.class, args);
+		SpringApplication.run(ClientApplication.class, args);
 
 		try (ServerSocket serverSocket = new ServerSocket(PORT)) {
 			System.out.println("Servidor em execução na porta " + PORT);

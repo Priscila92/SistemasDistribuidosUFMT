@@ -26,16 +26,18 @@ public class ClientController {
     }
 
     @PostMapping("/uploadFileName")
-    public String uploadFileName(@RequestParam String fileName) {
-        clientService.uploadFileName(fileName);
-        return "Arquivo " + fileName + " foi enviado com sucesso.";
+    public ResponseEntity<List<String>> uploadFileName(@RequestParam List<String> fileNames) {
+        clientService.uploadFileName(fileNames);
+        System.out.println("Arquivos foram enviados com sucesso.");
+        return  new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/download")
-    public String downloadFile(@RequestParam String fileName,@RequestParam String ipAddress,@RequestParam int port,
+    public ResponseEntity<?> downloadFile(@RequestParam String fileName,@RequestParam String ipAddress,@RequestParam int port,
                                @RequestParam long startByte,@RequestParam int chunkSize) {
         clientService.downloadFile(fileName,ipAddress,port,startByte,chunkSize);
-        return "Arquivo " + fileName + " foi baixado com sucesso.";
+        System.out.println("Arquivo " + fileName + " foi baixado com sucesso.");
+        return  new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/list")
