@@ -19,4 +19,12 @@ O software foi dividido em três módulos principais:
 
 Foram utilizadas as tecnologias de Web Services e Sockets para comunicação entre módulos.
 
+## Diagramas
+Também foram construídos diagramas do projeto para fortalecer os padrões de modelagem, documentação e comunicação do software. Para este projeto, foram elaborados três tipos de diagramas UML:
+
+- **Diagramas de Casos de Uso**
+- **Diagramas de Sequência**
+- **Diagramas de Classes**
+
+Os diagramas estão localizados em nossa página da [Wiki](https://github.com/Priscila92/SistemasDistribuidosUFMT/wiki).
 
