@@ -1,12 +1,12 @@
 # Trabalho Prático
 Universidade Federal de Mato Grosso  
 Instituto de Computação  
-Curso de Ciência da Computação
-Disciplina: Sistemas Distribuídos
-Discente: Dr. Luís César Darienzo Alves  
-Discentes: [Ana Novelo](https://github.com/AnaNovello), [Brendo Melo](https://github.com/BrBrendo), [Karla Souza](https://github.com/KarlaSouza), [Priscila Lopes](https://github.com/Priscila92) e [Rafaela Francisco](https://github.com/RafaelasFrancisco)  
+Curso de Ciência da Computação  
+Disciplina: Sistemas Distribuídos  
+Discente: Dr. Luís César Darienzo Alves   
+Discentes: [Ana Novello](https://github.com/AnaNovello), [Brendo Melo](https://github.com/BrBrendo), [Karla Souza](https://github.com/KarlaSouza), [Priscila Lopes](https://github.com/Priscila92) e [Rafaela Francisco](https://github.com/RafaelasFrancisco)  
 ## Compartilhador de Arquivos ##
-O objetivo deste projeto foi desenvolver um software que possibilite usuários compartilharem arquivos entre si, envolvendo o envio e recebimento de partes de um arquivo por meio de uma rede de comunicação. Dessa forma, um usuário pode receber um arquivo segmentado em múltiplas partes de várias fontes e, a partir disso, o software receptor deve ser capaz de reagrupar essas partes para fornecer ao usuário um único arquivo.
+O objetivo deste projeto é desenvolver um software que possibilite usuários compartilharem arquivos entre si, envolvendo o envio e recebimento de partes de um arquivo por meio de uma rede de comunicação. Dessa forma, um usuário pode receber um arquivo segmentado em múltiplas partes de várias fontes e, a partir disso, o software receptor deve ser capaz de reagrupar essas partes para fornecer ao usuário um único arquivo.
 
 # Arquitetura
 O software foi dividido em três módulos principais:
